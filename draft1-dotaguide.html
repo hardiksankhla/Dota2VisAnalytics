@@ -1,0 +1,596 @@
+<html>
+<title>Dota 2, The Beginner's Guide</title>
+
+<head>
+	<script src="http://d3js.org/d3.v3.min.js"  charset="utf-8"></script>
+	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/queue-async/1.0.7/queue.min.js"></script>
+</head>
+
+<body>
+	<div class="heroIcon"><h1>Hero Trend</h1></div>
+	<script>
+
+		function processData (errors, getMatchSeq, getGameItem, getHeroes, getMatchHistory)
+		{
+			console.log(getMatchSeq);
+			console.log(getGameItem);
+			console.log(getHeroes);
+			console.log(getMatchHistory);
+			getMatchHistory =	getMatchHistory.result.matches;
+			console.log(getMatchHistory);
+
+			var recipeList;
+				
+			recipeList = getGameItem.result.items;
+				
+			getHeroes = getHeroes.result.heroes									
+				
+			var Heroes = [];
+				
+			for(var i = 0; i < getHeroes.length; i++)
+			{
+				var withoutRecipe = [];
+				for(var j = 0; j < recipeList.length; j++)
+				{
+					if(recipeList[j].recipe == "0")
+					{	
+						withoutRecipe.push({"id":recipeList[j].id, "name":recipeList[j].name, "win":0,"loss":0 });
+					}
+				}
+				Heroes.push({"id":getHeroes[i].id, "name":getHeroes[i].name.slice(14),"items":withoutRecipe,"count":0});
+			}	
+				
+			console.log(Heroes);
+			getMatchSeq = getMatchSeq.result.matches;
+			console.log(getMatchSeq);
+			var getMatchDetails = [];
+
+			for(var i = 0; i< getMatchHistory.length; i++){
+				
+				function processData1 (errors, matchDetails)
+				{
+					//if(matchDetails != undefined){				
+						getMatchDetails.push(matchDetails.result);
+					//}
+				}
+				queue()
+					.defer(d3.json, "https://api.steampowered.com/IDOTA2Match_570/GetMatchDetails/v001/?key=332C490A9CE67E401FED8FC2DBEBDCFA&match_id="+getMatchHistory[i].match_id)
+					.await(processData1);
+			}
+
+
+			var x = 1;                     																				//  set your counter to 1
+			function myLoop () {           																				//  create a loop function
+				setTimeout(function () {    						
+					
+					console.log(getMatchDetails);																		//your code ends here
+					
+					for (var i =0;i<getMatchDetails.length;i++){
+						for(var j=0;j<getMatchDetails[i].players.length;j++){
+							
+							if(getMatchDetails[i].radiant_win == true){
+								if(getMatchDetails[i].players[j].player_slot<127 ){										//win
+									for(var k =0; k< Heroes.length; k++ ){
+										if(Heroes[k].id == getMatchDetails[i].players[j].hero_id){
+											Heroes[k].count++;
+											if(getMatchDetails[i].players[j].item_0 != 0){
+												for(var l =0 ; l <Heroes[k].items.length ; l++){
+													if(Heroes[k].items[l].id == getMatchDetails[i].players[j].item_0 ){
+														Heroes[k].items[l].win++;
+														console.log("break");
+													} 
+												}
+											}
+											if(getMatchDetails[i].players[j].item_1 != 0){
+												for(var l =0 ; l <Heroes[k].items.length ; l++){
+													if(Heroes[k].items[l].id == getMatchDetails[i].players[j].item_1){
+														Heroes[k].items[l].win++;
+														console.log("break");
+													} 
+												}
+											}
+											if(getMatchDetails[i].players[j].item_2 != 0){
+												for(var l =0 ; l <Heroes[k].items.length ; l++){
+													if(Heroes[k].items[l].id == getMatchDetails[i].players[j].item_2){
+														Heroes[k].items[l].win++;
+														console.log("break");
+													} 
+												}
+											}
+											if(getMatchDetails[i].players[j].item_3 != 0){
+												for(var l =0 ; l <Heroes[k].items.length ; l++){
+													if(Heroes[k].items[l].id == getMatchDetails[i].players[j].item_3){
+														Heroes[k].items[l].win++;
+														console.log("break");
+													} 
+												}
+											}
+											if(getMatchDetails[i].players[j].item_4 != 0){
+												for(var l =0 ; l <Heroes[k].items.length ; l++){
+													if(Heroes[k].items[l].id == getMatchDetails[i].players[j].item_4){
+														Heroes[k].items[l].win++;
+														console.log("break");
+													} 
+												}
+											}
+											if(getMatchDetails[i].players[j].item_5 != 0){
+												for(var l =0 ; l <Heroes[k].items.length ; l++){
+													if(Heroes[k].items[l].id == getMatchDetails[i].players[j].item_5){
+														Heroes[k].items[l].win++;
+														console.log("break");
+													} 
+												}
+											}
+										}
+									}
+								}
+							}
+
+							if(getMatchDetails[i].radiant_win == true){
+								if(getMatchDetails[i].players[j].player_slot>127 ){										//loss
+									for(var k =0; k< Heroes.length; k++ ){
+										if(Heroes[k].id == getMatchDetails[i].players[j].hero_id){
+											Heroes[k].count++;
+											if(getMatchDetails[i].players[j].item_0 != 0){
+												for(var l =0 ; l <Heroes[k].items.length ; l++){
+													if(Heroes[k].items[l].id == getMatchDetails[i].players[j].item_0){
+														Heroes[k].items[l].loss++;
+														console.log("break");
+													} 
+												}
+											}
+											if(getMatchDetails[i].players[j].item_1 != 0){
+												for(var l =0 ; l <Heroes[k].items.length ; l++){
+													if(Heroes[k].items[l].id == getMatchDetails[i].players[j].item_1){
+														Heroes[k].items[l].loss++;
+														console.log("break");
+													} 
+												}
+											}
+											if(getMatchDetails[i].players[j].item_2 != 0){
+												for(var l =0 ; l <Heroes[k].items.length ; l++){
+													if(Heroes[k].items[l].id == getMatchDetails[i].players[j].item_2){
+														Heroes[k].items[l].loss++;
+														console.log("break");
+													} 
+												}
+											}
+											if(getMatchDetails[i].players[j].item_3 != 0){
+												for(var l =0 ; l <Heroes[k].items.length ; l++){
+													if(Heroes[k].items[l].id == getMatchDetails[i].players[j].item_3){
+														Heroes[k].items[l].loss++;
+														console.log("break");
+													} 
+												}
+											}
+											if(getMatchDetails[i].players[j].item_4 != 0){
+												for(var l =0 ; l <Heroes[k].items.length ; l++){
+													if(Heroes[k].items[l].id == getMatchDetails[i].players[j].item_4){
+														Heroes[k].items[l].loss++;
+														console.log("break");
+													} 
+												}
+											}
+											if(getMatchDetails[i].players[j].item_5 != 0){
+												for(var l =0 ; l <Heroes[k].items.length ; l++){
+													if(Heroes[k].items[l].id == getMatchDetails[i].players[j].item_5){
+														Heroes[k].items[l].loss++;
+														console.log("break");
+													} 
+												}
+											}
+
+										}
+									}
+								}
+							}
+
+							if(getMatchDetails[i].radiant_win == false){
+								if(getMatchDetails[i].players[j].player_slot<127 ){										//loss
+									for(var k =0; k< Heroes.length; k++ ){
+										if(Heroes[k].id == getMatchDetails[i].players[j].hero_id){
+											Heroes[k].count++;
+											if(getMatchDetails[i].players[j].item_0 != 0){
+												for(var l =0 ; l <Heroes[k].items.length ; l++){
+													if(Heroes[k].items[l].id == getMatchDetails[i].players[j].item_0){
+														Heroes[k].items[l].loss++;
+														console.log(i);console.log(j);console.log(k);console.log(l);console.log("break");
+													} 
+												}
+											}
+											if(getMatchDetails[i].players[j].item_1 != 0){
+												for(var l =0 ; l <Heroes[k].items.length ; l++){
+													if(Heroes[k].items[l].id == getMatchDetails[i].players[j].item_1){
+														Heroes[k].items[l].loss++;
+														console.log(i);console.log(j);console.log(k);console.log(l);console.log("break");
+													} 
+												}
+											}
+											if(getMatchDetails[i].players[j].item_2 != 0){
+												for(var l =0 ; l <Heroes[k].items.length ; l++){
+													if(Heroes[k].items[l].id == getMatchDetails[i].players[j].item_2){
+														Heroes[k].items[l].loss++;
+														console.log(i);console.log(j);console.log(k);console.log(l);console.log("break");
+													} 
+												}
+											}
+											if(getMatchDetails[i].players[j].item_3 != 0){
+												for(var l =0 ; l <Heroes[k].items.length ; l++){
+													if(Heroes[k].items[l].id == getMatchDetails[i].players[j].item_3){
+														Heroes[k].items[l].loss++;
+														console.log(i);console.log(j);console.log(k);console.log(l);console.log("break");
+													} 
+												}
+											}
+											if(getMatchDetails[i].players[j].item_4 != 0){
+												for(var l =0 ; l <Heroes[k].items.length ; l++){
+													if(Heroes[k].items[l].id == getMatchDetails[i].players[j].item_4){
+														Heroes[k].items[l].loss++;
+														console.log(i);console.log(j);console.log(k);console.log(l);console.log("break");
+													} 
+												}
+											}
+											if(getMatchDetails[i].players[j].item_5 != 0){
+												for(var l =0 ; l <Heroes[k].items.length ; l++){
+													if(Heroes[k].items[l].id == getMatchDetails[i].players[j].item_5){
+														Heroes[k].items[l].loss++;
+														console.log(i);console.log(j);console.log(k);console.log(l);console.log("break");
+													} 
+												}
+											}
+											
+										}
+									}
+								}
+							}
+
+							if(getMatchDetails[i].radiant_win == false){
+								if(getMatchDetails[i].players[j].player_slot>127 ){										//win
+									for(var k =0; k< Heroes.length; k++ ){
+										if(Heroes[k].id == getMatchDetails[i].players[j].hero_id){
+
+											if(getMatchDetails[i].players[j].item_0 != 0){
+												for(var l =0 ; l <Heroes[k].items.length ; l++){
+													if(Heroes[k].items[l].id == getMatchDetails[i].players[j].item_0){
+														Heroes[k].items[l].win++;
+														console.log(i);console.log(j);console.log(k);console.log(l);console.log("break");
+													} 
+												}
+											}
+											if(getMatchDetails[i].players[j].item_1 != 0){
+												for(var l =0 ; l <Heroes[k].items.length ; l++){
+													if(Heroes[k].items[l].id == getMatchDetails[i].players[j].item_1){
+														Heroes[k].items[l].win++;
+														console.log(i);console.log(j);console.log(k);console.log(l);console.log("break");
+													} 
+												}
+											}
+											if(getMatchDetails[i].players[j].item_2 != 0){
+												for(var l =0 ; l <Heroes[k].items.length ; l++){
+													if(Heroes[k].items[l].id == getMatchDetails[i].players[j].item_2){
+														Heroes[k].items[l].win++;
+														console.log(i);console.log(j);console.log(k);console.log(l);console.log("break");
+													} 
+												}
+											}
+											if(getMatchDetails[i].players[j].item_3 != 0){
+												for(var l =0 ; l <Heroes[k].items.length ; l++){
+													if(Heroes[k].items[l].id == getMatchDetails[i].players[j].item_3){
+														Heroes[k].items[l].win++;
+														console.log(i);console.log(j);console.log(k);console.log(l);console.log("break");
+													} 
+												}
+											}
+											if(getMatchDetails[i].players[j].item_4 != 0){
+												for(var l =0 ; l <Heroes[k].items.length ; l++){
+													if(Heroes[k].items[l].id == getMatchDetails[i].players[j].item_4){
+														Heroes[k].items[l].win++;
+														console.log(i);console.log(j);console.log(k);console.log(l);console.log("break");
+													} 
+												}
+											}
+											if(getMatchDetails[i].players[j].item_5 != 0){
+												for(var l =0 ; l <Heroes[k].items.length ; l++){
+													if(Heroes[k].items[l].id == getMatchDetails[i].players[j].item_5){
+														Heroes[k].items[l].win++;
+														console.log(i);console.log(j);console.log(k);console.log(l);console.log("break");
+													} 
+												}
+											}
+
+										}
+									}
+								}
+							}
+
+						}
+					}
+
+					console.log(Heroes);
+					for(var i= 0 ; i< Heroes.length ; i++ ){
+						for(var j =0 ; j<Heroes[i].items.length ; j++ ){
+							for(var k=j ; k<Heroes[i].items.length ; k++){
+								if(Heroes[i].items[j].win < Heroes[i].items[k].win){
+									var x= Heroes[i].items[j];
+									Heroes[i].items[j] = Heroes[i].items[k];
+									Heroes[i].items[k] = x;
+
+								}
+								/*if(Heroes[i].items[k].win > Heroes[i].items[].win){
+									// do nothing
+								}*/
+							}
+						}
+					}
+
+					console.log(Heroes);
+					for(var i= 0 ; i< Heroes.length ; i++ ){
+						for(var j =0 ; j<Heroes[i].items.length ; j++ ){
+							for(var k=j ; k<Heroes[i].items.length ; k++){
+								if((Heroes[i].items[j].win*Heroes[i].items[j].win*Heroes[i].items[j].win)/((Heroes[i].items[j].win+Heroes[i].items[j].loss)*(Heroes[i].items[j].win+Heroes[i].items[j].loss)) < (Heroes[i].items[k].win*Heroes[i].items[k].win*Heroes[i].items[k].win)/((Heroes[i].items[k].win+Heroes[i].items[k].loss)*(Heroes[i].items[k].win+Heroes[i].items[k].loss)) ) {
+									var x= Heroes[i].items[j];
+									Heroes[i].items[j] = Heroes[i].items[k];
+									Heroes[i].items[k] = x;
+
+								}
+								/*if(Heroes[i].items[k].win > Heroes[i].items[].win){
+									// do nothing
+								}*/
+							}
+						}
+					}
+					console.log(Heroes);
+
+					var FinalHeroes = [];
+					for(var i = 0 ; i< Heroes.length ; i++){
+						var withoutRecipe2 = [];
+						for(var j =0 ; j<20;j++){
+							withoutRecipe2.push({"id":Heroes[i].items[j].id, "name":Heroes[i].items[j].name, "win":Heroes[i].items[j].win, "loss":Heroes[i].items[j].loss });
+						}
+						FinalHeroes.push({"id":Heroes[i].id, "name":Heroes[i].name, "items":withoutRecipe2,"count":Heroes[i].count});
+					}
+					console.log(FinalHeroes);
+
+					var FinalHeroes2 = [];
+					for(var i = 0 ; i< FinalHeroes.length ; i++){
+						var withoutRecipe = [];
+						for(var j = 0 ; j<9 ; ){
+							var withoutRecipe2 = [];
+							for(var k = j ; k< j+6 ; ){
+								withoutRecipe2.push({"id":FinalHeroes[i].items[k].id, "name":FinalHeroes[i].items[k].name, "win":FinalHeroes[i].items[k].win, "loss":FinalHeroes[i].items[k].loss });
+								k=k+1;
+							}
+							withoutRecipe.push(withoutRecipe2);
+							j = j+3;
+						}
+						FinalHeroes2.push({"id":FinalHeroes[i].id, "name":FinalHeroes[i].name, "items":withoutRecipe,"count":FinalHeroes[i].count});
+					}
+
+					console.log(FinalHeroes2);
+					console.log(FinalHeroes2[0].items[0][0].name.slice(0));
+					console.log("http://cdn.dota2.com/apps/dota2/images/heroes/"+FinalHeroes2[0].name+"_sb.png");
+					
+					var max =1;
+					var x = screen.height;
+					var barHeight = 33;
+
+					var svg = d3.select("div.heroIcon").append("svg")
+					.attr("width", 800)
+					.attr("height", function(d,i){return 120*FinalHeroes2.length + 35;});
+
+
+					var g = svg.selectAll("g")
+					.data(FinalHeroes2)
+					.enter()
+					.append("g");
+			
+					var img = g.append("svg1:image")
+					.attr("y", function(d,i){return i*120 + 35 })
+					.attr("x", 10 )
+					.attr("height", barHeight)
+					.attr("width", 59)
+					.attr("class","icon")
+					.attr("xlink:href", function(d,i){return "http://cdn.dota2.com/apps/dota2/images/heroes/"+FinalHeroes2[i].name+"_sb.png";});
+					
+					var img = g.append("svg2:image")
+					.attr("y", function(d,i){return i*120  })
+					.attr("x", 150 )
+					.attr("height", barHeight)
+					.attr("width", 59)
+					.attr("class","icon")
+					.attr("xlink:href", function(d,i){return "http://cdn.dota2.com/apps/dota2/images/items/"+FinalHeroes2[i].items[0][0].name.slice(5)+"_lg.png";});
+
+					var img = g.append("svg3:image")
+					.attr("y", function(d,i){return i*120 + 35 })
+					.attr("x", 150 )
+					.attr("height", barHeight)
+					.attr("width", 59)
+					.attr("class","icon")
+					.attr("xlink:href", function(d,i){return "http://cdn.dota2.com/apps/dota2/images/items/"+FinalHeroes2[i].items[1][0].name.slice(5)+"_lg.png";});
+
+					var img = g.append("svg4:image")
+					.attr("y", function(d,i){return i*120 + 35 + 35})
+					.attr("x", 150 )
+					.attr("height", barHeight)
+					.attr("width", 59)
+					.attr("class","icon")
+					.attr("xlink:href", function(d,i){return "http://cdn.dota2.com/apps/dota2/images/items/"+FinalHeroes2[i].items[2][0].name.slice(5)+"_lg.png";});
+
+
+
+
+					var img = g.append("svg12:image")
+					.attr("y", function(d,i){return i*120  })
+					.attr("x", 196 )
+					.attr("height", barHeight)
+					.attr("width", 59)
+					.attr("class","icon")
+					.attr("xlink:href", function(d,i){return "http://cdn.dota2.com/apps/dota2/images/items/"+FinalHeroes2[i].items[0][1].name.slice(5)+"_lg.png";});
+
+					var img = g.append("svg13:image")
+					.attr("y", function(d,i){return i*120 + 35 })
+					.attr("x", 196 )
+					.attr("height", barHeight)
+					.attr("width", 59)
+					.attr("class","icon")
+					.attr("xlink:href", function(d,i){return "http://cdn.dota2.com/apps/dota2/images/items/"+FinalHeroes2[i].items[1][1].name.slice(5)+"_lg.png";});
+
+					var img = g.append("svg14:image")
+					.attr("y", function(d,i){return i*120 + 35 + 35})
+					.attr("x", 196 )
+					.attr("height", barHeight)
+					.attr("width", 59)
+					.attr("class","icon")
+					.attr("xlink:href", function(d,i){return "http://cdn.dota2.com/apps/dota2/images/items/"+FinalHeroes2[i].items[2][1].name.slice(5)+"_lg.png";});
+
+
+
+
+
+
+
+					var img = g.append("svg22:image")
+					.attr("y", function(d,i){return i*120  })
+					.attr("x", 242 )
+					.attr("height", barHeight)
+					.attr("width", 59)
+					.attr("class","icon")
+					.attr("xlink:href", function(d,i){return "http://cdn.dota2.com/apps/dota2/images/items/"+FinalHeroes2[i].items[0][2].name.slice(5)+"_lg.png";});
+
+					var img = g.append("svg23:image")
+					.attr("y", function(d,i){return i*120 + 35 })
+					.attr("x", 242 )
+					.attr("height", barHeight)
+					.attr("width", 59)
+					.attr("class","icon")
+					.attr("xlink:href", function(d,i){return "http://cdn.dota2.com/apps/dota2/images/items/"+FinalHeroes2[i].items[1][2].name.slice(5)+"_lg.png";});
+
+					var img = g.append("svg24:image")
+					.attr("y", function(d,i){return i*120 + 35 + 35})
+					.attr("x", 242 )
+					.attr("height", barHeight)
+					.attr("width", 59)
+					.attr("class","icon")
+					.attr("xlink:href", function(d,i){return "http://cdn.dota2.com/apps/dota2/images/items/"+FinalHeroes2[i].items[2][2].name.slice(5)+"_lg.png";});
+
+
+
+
+
+
+
+
+					var img = g.append("svg32:image")
+					.attr("y", function(d,i){return i*120  })
+					.attr("x", 288 )
+					.attr("height", barHeight)
+					.attr("width", 59)
+					.attr("class","icon")
+					.attr("xlink:href", function(d,i){return "http://cdn.dota2.com/apps/dota2/images/items/"+FinalHeroes2[i].items[0][3].name.slice(5)+"_lg.png";});
+
+					var img = g.append("svg33:image")
+					.attr("y", function(d,i){return i*120 + 35 })
+					.attr("x", 288 )
+					.attr("height", barHeight)
+					.attr("width", 59)
+					.attr("class","icon")
+					.attr("xlink:href", function(d,i){return "http://cdn.dota2.com/apps/dota2/images/items/"+FinalHeroes2[i].items[1][3].name.slice(5)+"_lg.png";});
+
+					var img = g.append("svg34:image")
+					.attr("y", function(d,i){return i*120 + 35 + 35})
+					.attr("x", 288 )
+					.attr("height", barHeight)
+					.attr("width", 59)
+					.attr("class","icon")
+					.attr("xlink:href", function(d,i){return "http://cdn.dota2.com/apps/dota2/images/items/"+FinalHeroes2[i].items[2][3].name.slice(5)+"_lg.png";});
+
+
+
+
+
+
+
+					var img = g.append("svg42:image")
+					.attr("y", function(d,i){return i*120  })
+					.attr("x", 334 )
+					.attr("height", barHeight)
+					.attr("width", 59)
+					.attr("class","icon")
+					.attr("xlink:href", function(d,i){return "http://cdn.dota2.com/apps/dota2/images/items/"+FinalHeroes2[i].items[0][4].name.slice(5)+"_lg.png";});
+
+					var img = g.append("svg43:image")
+					.attr("y", function(d,i){return i*120 + 35 })
+					.attr("x", 334 )
+					.attr("height", barHeight)
+					.attr("width", 59)
+					.attr("class","icon")
+					.attr("xlink:href", function(d,i){return "http://cdn.dota2.com/apps/dota2/images/items/"+FinalHeroes2[i].items[1][4].name.slice(5)+"_lg.png";});
+
+					var img = g.append("svg44:image")
+					.attr("y", function(d,i){return i*120 + 35 + 35})
+					.attr("x", 334 )
+					.attr("height", barHeight)
+					.attr("width", 59)
+					.attr("class","icon")
+					.attr("xlink:href", function(d,i){return "http://cdn.dota2.com/apps/dota2/images/items/"+FinalHeroes2[i].items[2][4].name.slice(5)+"_lg.png";});
+
+
+
+
+
+
+
+
+					var img = g.append("svg52:image")
+					.attr("y", function(d,i){return i*120  })
+					.attr("x", 380 )
+					.attr("height", barHeight)
+					.attr("width", 59)
+					.attr("class","icon")
+					.attr("xlink:href", function(d,i){return "http://cdn.dota2.com/apps/dota2/images/items/"+FinalHeroes2[i].items[0][5].name.slice(5)+"_lg.png";});
+
+					var img = g.append("svg53:image")
+					.attr("y", function(d,i){return i*120 + 35 })
+					.attr("x", 380 )
+					.attr("height", barHeight)
+					.attr("width", 59)
+					.attr("class","icon")
+					.attr("xlink:href", function(d,i){return "http://cdn.dota2.com/apps/dota2/images/items/"+FinalHeroes2[i].items[1][5].name.slice(5)+"_lg.png";});
+
+					var img = g.append("svg54:image")
+					.attr("y", function(d,i){return i*120 + 35 + 35})
+					.attr("x", 380 )
+					.attr("height", barHeight)
+					.attr("width", 59)
+					.attr("class","icon")
+					.attr("xlink:href", function(d,i){return "http://cdn.dota2.com/apps/dota2/images/items/"+FinalHeroes2[i].items[2][5].name.slice(5)+"_lg.png";});
+					
+
+
+					x++;                     																			//  increment the counter
+					if (x < 1) {            																//  if the counter < 10, call the loop function
+						myLoop();             																	//  ..  again which will trigger another 
+					}
+				                        																			//  ..  setTimeout()
+				} , 25000)
+			}
+		
+			myLoop();
+				
+		}
+
+		queue()
+			.defer(d3.json, "http://api.steampowered.com/IDOTA2Match_570/GetMatchHistoryBySequenceNum/v1/?key=332C490A9CE67E401FED8FC2DBEBDCFA")
+			.defer(d3.json, "https://api.steampowered.com/IEconDOTA2_570/GetGameItems/V001/?key=332C490A9CE67E401FED8FC2DBEBDCFA")
+			.defer(d3.json, "https://api.steampowered.com/IEconDOTA2_570/GetHeroes/v1/?key=332C490A9CE67E401FED8FC2DBEBDCFA")
+			.defer(d3.json, "https://api.steampowered.com/IDOTA2Match_570/GetMatchHistory/V001/?key=332C490A9CE67E401FED8FC2DBEBDCFA")
+			.await(processData);
+
+
+
+	</script>
+</body>
+
+
+
+</html>
